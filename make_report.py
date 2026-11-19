@@ -3,6 +3,7 @@
 Run after replicate.py and stage5.py, with MaRCo's Python:  <MaRCo>/.venv/Scripts/python.exe make_report.py
 """
 import json
+import os
 import pathlib
 import sys
 
@@ -10,7 +11,8 @@ import numpy as np
 import pandas as pd
 import yaml
 
-sys.path.insert(0, r"C:\Users\consu\Documents\Universidad\Tesis\extension\tools\marco-BIS\scripts")
+# MaRCo@BIS scripts folder: set MARCO_SCRIPTS to its path (MaRCo is not part of this package)
+sys.path.insert(0, os.environ.get("MARCO_SCRIPTS", str(pathlib.Path.home() / "marco-BIS" / "scripts")))
 import lib  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
