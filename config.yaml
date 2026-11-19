@@ -1,0 +1,73 @@
+# islamic_malaysia_transmission: do Islamic and conventional banks in Malaysia respond differently to the same shock?
+# MaRCo Mode C. Every setting the estimation uses is here. Items marked PENDING await the Stage 3 gate.
+
+run_id: islamic_malaysia_transmission
+description: >
+  Within-country local projections. Islamic minus conventional responses, within loan purpose (or sector, deposit
+  type, SME sector), to US monetary policy surprises, changes in Malaysia's overnight policy rate and global
+  risk-off shocks. Conventional = whole banking system minus the Islamic banking system (BNM tables).
+
+sample:
+  financing: {start: "2006-12", end: "2026-09"}
+  deposits: {start: "2007-01", end: "2026-09"}
+  rates: {start: "2011-01", end: "2026-09"}        # Islamic rates are monthly only from 2011-01 (table 2.2)
+  sme: {start: "2021-07", end: "2026-09"}
+  investment_accounts: {start: "2015-07", end: "2026-09"}
+
+shocks:
+  jk_mp:     {label: "US monetary policy surprise (Jarocinski-Karadi, pure policy)", scale: per_sd, also: per_25bp}
+  d_opr:     {label: "Change in Malaysia's overnight policy rate (BNM table 2.3)", scale: per_25bp}
+  vix_innov: {label: "Global risk-off shock (VIX innovation, orthogonal to JK)", scale: per_sd, role: secondary}
+
+blocks:
+  credit:            # H3, primary
+    data: financing.csv
+    unit: [category, bank]          # purpose x {islamic, conventional}
+    dims: {purpose: headline, sector: secondary}
+    outcome: "100 x log outstanding"
+    fixed_effects: [category_x_month, category_x_bank]
+    own_lags: 3
+    weights: equal                   # robustness: value-weighted
+  pricing:           # H1 primary, H2a
+    data: rates.csv
+    pairs:
+      book:    [isl_afr, conv_alr]   # average financing / lending rate on outstanding (primary)
+      base:    [isl_br, conv_br]     # Base Rate, from 2015-01
+      fd1:     [isl_fd1, conv_fd1]
+      fd3:     [isl_fd3, conv_fd3]
+      fd12:    [isl_fd12, conv_fd12]
+      savings: [isl_sav, conv_sav]
+      ia12:    [isl_ia12, conv_fd12] # H4, from 2015-07
+    outcome: "change in spread (pp); also each rate's cumulative pass-through"
+    lags: {spread_change: 3, d_opr: 3}
+  funding:           # H2b
+    data: deposits.csv
+    dims: {type: headline, holder: secondary}
+    islamic_term: term_incl_ia       # mudharabah + tawarruq deposits + investment accounts (IFSA 2013)
+    outcome: "share of the bank type's funding, pp"
+  sme:               # H5, exploratory
+    data: sme.csv
+    unit: [sector, bank]             # Islamic banks vs commercial banks; development financial institutions excluded
+    outcomes: [approval_rate, log_disbursed, log_outstanding]
+
+breaks:              # PENDING user approval at the Stage 3 gate
+  splice: {month: "2021-07", rule: "chain-link where the new/old overlap ratio is within 5%; otherwise drop windows crossing the splice"}
+  events:
+    - {month: "2018-04", series: "islamic and system financing, all categories", reason: "one-month +RM38.5bn (+7.4%) jump in Islamic financing with no conventional offset: a new institution entering the banking system (likely MBSB Bank)"}
+  jump_rule: "a monthly change with |100 x dlog| > 10 is unusable (windows containing it are dropped)"
+  dummies: ["2015-01 Base Rate reform", "2015-07 deposit / investment-account split"]
+
+horizons: {max: 24, report: [0, 3, 6, 12, 18, 24]}
+
+inference:
+  panel_se: driscoll_kraay           # groups = month, maxlags = h + 2
+  ts_se: newey_west                  # maxlags = h + 2
+  permutation: {draws: 999, block_months: 12, seed: 20261119}
+  placebo: {window: [-4, -1]}
+  primary_tests:                     # fixed before estimation; Holm correction across these six
+    - {block: credit, dim: purpose, shock: jk_mp, h: 12}
+    - {block: credit, dim: purpose, shock: d_opr, h: 12}
+    - {block: pricing, pair: book, shock: d_opr, h: 6}
+    - {block: pricing, pair: book, shock: d_opr, h: 12}
+    - {block: pricing, pair: book, shock: jk_mp, h: 6}
+    - {block: pricing, pair: book, shock: jk_mp, h: 12}

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# build artefacts
+paper/working_paper_print.html
+outputs/run_log.txt
+outputs/stage5_log.txt

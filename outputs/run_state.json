@@ -1,0 +1,19 @@
+{
+  "run_id": "islamic_malaysia_transmission",
+  "script_dir": "Islamic_Finance_Project/marco/islamic_malaysia_transmission/",
+  "mode": "C",
+  "current_stage": 7,
+  "stages_completed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "status": "closed",
+  "disposition": "keep",
+  "next_action": null,
+  "updated_at": "2026-11-19T08:00:00Z"
+}

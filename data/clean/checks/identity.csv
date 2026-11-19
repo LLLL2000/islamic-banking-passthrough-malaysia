@@ -1,0 +1,3 @@
+tables,months,sum_of_parts_vs_total_max_abs_gap,islamic_banks_row_ratio_mean,islamic_banks_row_ratio_min,islamic_banks_row_ratio_max,islamic_system_share_first,islamic_system_share_last
+1.19a vs 1.19.1a,188,1.0,1.0000000001930682,1.0,1.000000033786926,0.13240551088876973,0.3719325549232619
+1.19 vs 1.19.1,63,2.2083611341698746e-16,1.0,0.9999999999999991,1.0000000000000007,0.3744035768668398,0.444162885056878
