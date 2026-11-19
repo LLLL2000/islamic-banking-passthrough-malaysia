@@ -32,7 +32,7 @@ python make_figures.py       # paper/figures/
 python -I paper/build_pdf.py # paper/working_paper.pdf (headless Microsoft Edge)
 ```
 
-`config.yaml` holds every setting the estimation uses. `make_report.py` builds the interactive
+`config.yaml` holds every setting the estimation uses. `make_report.py` (set `MARCO_SCRIPTS` to the MaRCo `scripts` folder) builds the interactive
 [`outputs/report.html`](outputs/report.html) with the MaRCo@BIS framework, which is not included here.
 
 | File | Role |
